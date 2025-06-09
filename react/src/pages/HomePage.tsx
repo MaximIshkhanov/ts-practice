@@ -7,25 +7,37 @@ import { ThemeProvider } from '../context/theme';
 import { useForm } from '../hooks';
 import { saveSettings } from '../utils';
 
+interface Option {
+  id: number;
+  value: string;
+  name?: string;
+  label?: string;
+}
+
 const HomePage = () => {
-  const [theme, setTheme] = useState(window.appSettings.theme);
 
-  const [firstOptions, setFirstOtions] = useState([]);
-  const [selectedFirstOption, setSelectedFirstOption] = useState(null);
+  function isValidId(id: number): id is 1 | 2 | 3 {
+    return id === 1 || id === 2 || id === 3;
+  }
+  
+  const [theme, setTheme] = useState<'light' | 'dark'>(window.appSettings.theme);
 
-  const [error, setError] = useState('');
+  const [firstOptions, setFirstOptions] = useState<Option[]>([]);
+  const [selectedFirstOption, setSelectedFirstOption] = useState<Option | null>(null);
 
-  const [secondOptions, setSecondOptions] = useState([]);
-  const [selectedSecondOption, setSelectedSecondOption] = useState(null);
+  const [error, setError] = useState<string>('');
+
+  const [secondOptions, setSecondOptions] = useState<Option[]>([]);
+  const [selectedSecondOption, setSelectedSecondOption] = useState<Option | null>(null);
 
   const [nameForm, setName] = useForm({ firstName: '', lastName: '' });
 
   const getOptions = async () => {
     try {
       const data = await getFirstOptions();
-      setFirstOtions(data);
-    } catch (error) {
-      setError(error);
+      setFirstOptions(data);
+    } catch (err) {
+      setError((err as Error).message);
     }
   };
 
@@ -33,23 +45,28 @@ const HomePage = () => {
     getOptions();
   }, []);
 
-  const onChangeFirstOption = async (value) => {
-    setSelectedFirstOption(value);
-    if (value == null) {
-      setSelectedSecondOption(null);
-    }
+  const onChangeFirstOption = async (value: Option | null) => {
+  setSelectedFirstOption(value);
+  if (value == null) {
+    setSelectedSecondOption(null);
+    return;
+  }
 
+  if (isValidId(value.id)) {
     const data = await getSecondOptions({ id: value.id });
     setSecondOptions(data);
-  };
+  } else {
+    setSecondOptions([]);
+  }
+};
 
-  const onChangeSecondOption = (value) => {
+  const onChangeSecondOption = (value: Option | null) => {
     setSelectedSecondOption(value);
   };
 
-  const handleChangeNameForm = (event) => {
+  const handleChangeNameForm = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setName(name, value);
+    setName(name as 'firstName' | 'lastName', value);
   };
 
   const onHideError = () => {
@@ -57,8 +74,9 @@ const HomePage = () => {
     getOptions();
   };
 
-  const saveForm = (e) => {
+  const saveForm = (e: React.FormEvent) => {
     e.preventDefault();
+    // логика сохранения формы
   };
 
   const toggleTheme = () => {
@@ -115,7 +133,7 @@ const HomePage = () => {
         </div>
         <br />
         <Button variant="secondary" onClick={toggleTheme}>
-          <span>Toggle them</span>
+          <span>Toggle theme</span>
         </Button>
         &nbsp;
         <Button
