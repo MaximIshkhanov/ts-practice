@@ -1,35 +1,42 @@
-const Select = (props) => {
-  const {
-    name = '',
-    labelKey = 'name',
-    valueKey = 'value',
-    options,
-    selected,
-    onChange,
-  } = props;
+import React from 'react';
 
-  const handleChange = (event) => {
+type SelectChangeEvent = React.ChangeEvent<HTMLSelectElement>;
+
+interface SelectProps<T> {
+  name?: string;
+  labelKey?: keyof T;
+  valueKey?: keyof T;
+  options: T[];
+  selected?: T | null;
+  onChange: (selected: T | null, event: SelectChangeEvent) => void;
+}
+
+function Select<T extends Record<string, any>>({
+  name = '',
+  labelKey = 'name' as keyof T,
+  valueKey = 'value' as keyof T,
+  options,
+  selected,
+  onChange,
+}: SelectProps<T>) {
+  const handleChange = (event: SelectChangeEvent) => {
     const { value } = event.target;
-    const option = options.find((item) => item[valueKey] === value) ?? null;
+    const option = options.find((item) => String(item[valueKey]) === value) ?? null;
     onChange(option, event);
   };
 
   return (
-    <select name={name} onChange={handleChange}>
-      <option defaultValue={selected?.value} value="empty">
+    <select name={name} onChange={handleChange} value={selected?.[valueKey] ?? 'empty'}>
+      <option value="empty" disabled>
         Select option
       </option>
       {options.map((item) => (
-        <option
-          key={item.id}
-          value={item[valueKey]}
-          defaultValue={selected?.value}
-        >
-          {item[labelKey]}
+        <option key={String(item[valueKey])} value={String(item[valueKey])}>
+          {String(item[labelKey])}
         </option>
       ))}
     </select>
   );
-};
+}
 
 export default Select;
