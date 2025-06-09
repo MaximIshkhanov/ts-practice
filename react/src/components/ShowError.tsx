@@ -1,8 +1,13 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-const ShowError = (props) => {
-  const { children, onHide, delay = 5000, show } = props;
+interface ShowErrorProps {
+  children: React.ReactNode;
+  onHide: () => void;
+  delay?: number;
+  show: boolean;
+}
 
+const ShowError: React.FC<ShowErrorProps> = ({ children, onHide, delay = 5000, show }) => {
   useEffect(() => {
     if (show) {
       const timer = setTimeout(onHide, delay);
