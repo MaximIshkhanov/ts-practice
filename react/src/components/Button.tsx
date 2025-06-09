@@ -1,18 +1,28 @@
+import React from 'react';
 import { useTheme } from '../hooks';
 
-const Button = (props) => {
-  const {
-    children,
-    variant = 'primary', // secondary, warn, error
-    disabled = false,
-    outlined = false,
-    onClick,
-    type = 'button',
-  } = props;
+type ButtonVariant = 'primary' | 'secondary' | 'warn' | 'error';
 
+interface ButtonProps {
+  children: React.ReactNode;
+  variant?: ButtonVariant;
+  disabled?: boolean;
+  outlined?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  type?: 'button' | 'submit' | 'reset';
+}
+
+const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = 'primary',
+  disabled = false,
+  outlined = false,
+  onClick,
+  type = 'button',
+}) => {
   const [theme] = useTheme();
 
-  const buttonStyles =
+  const buttonStyles: React.CSSProperties =
     theme === 'light'
       ? { background: 'white', color: 'black' }
       : { background: 'black', color: 'white' };
